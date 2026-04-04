@@ -566,8 +566,8 @@
             <span class="card-label">device</span>
         </div>
         <div class="ip-row">
-            <input type="text" id="ipInput" placeholder="192.168.1.x" value="192.168.1.100">
-            <button class="btn-connect" onclick="connectDevice()">connect</button>
+            <input type="text" id="ipInput" placeholder="https://xxx.trycloudflare.com" value="">
+            <div class="hint">URL tunnel atau IP ESP32 langsung</div>
         </div>
         <div class="hint">IP ESP32 — cek Serial Monitor saat hardware nyala</div>
     </div>
@@ -681,10 +681,12 @@
 <div class="toast" id="toast"></div>
 
 <script>
-    let API = 'http://192.168.1.100';
+    let API = 'https://criterion-bedroom-controller-alt.trycloudflare.com';
     let pingInterval = null;
 
-    function getAPI() { return 'http://' + document.getElementById('ipInput').value.trim(); }
+    function getAPI() {
+        return document.getElementById('ipInput').value.trim().replace(/\/$/, '');
+    }
 
     function showToast(msg, type = 'success') {
         const t = document.getElementById('toast');
@@ -700,7 +702,10 @@
         tx.textContent = msg;
     }
 
-    function hideAlert() { document.getElementById('alertBanner').style.display = 'none'; document.getElementById('alertBanner').className = 'alert-banner'; }
+    function hideAlert() {
+        document.getElementById('alertBanner').style.display = 'none';
+        document.getElementById('alertBanner').className = 'alert-banner';
+    }
 
     function setStatus(state, label, time = '') {
         const pill = document.getElementById('statusPill');
@@ -718,16 +723,15 @@
 
     async function pingDevice() {
         try {
-            const r = await fetch(`${API}/api/status`, { signal: AbortSignal.timeout(3000) });
+            const r = await fetch(`${API}/api/schedules`, { signal: AbortSignal.timeout(5000) });
             if (r.ok) {
-                const data = await r.json();
-                setStatus('online', 'online', 'pukul ' + data.time + (data.cameraReady ? ' · kamera siap' : ' · kamera offline'));
+                setStatus('online', 'online', 'terhubung · kamera offline');
                 hideAlert();
                 return true;
             }
         } catch (e) {
             setStatus('offline', 'offline');
-            showAlert('ESP32 tidak merespon — cek koneksi WiFi atau IP device', 'error');
+            showAlert('Backend tidak merespon — cek server atau tunnel URL', 'error');
         }
         return false;
     }
@@ -737,7 +741,7 @@
         setStatus('connecting', 'connecting');
         const ok = await pingDevice();
         if (ok) {
-            showToast('terhubung ke device');
+            showToast('terhubung ke backend');
             loadSchedules();
             loadHistory();
             clearInterval(pingInterval);
@@ -746,10 +750,11 @@
     }
 
     function startStream() {
-        API = getAPI();
+        const espIP = prompt('Masukkan IP ESP32 (contoh: 192.168.1.x):');
+        if (!espIP) return;
         const img = document.getElementById('streamImg');
         const ph = document.getElementById('camPlaceholder');
-        img.src = `${API}/stream?t=${Date.now()}`;
+        img.src = `http://${espIP}/stream?t=${Date.now()}`;
         img.classList.add('active');
         ph.style.display = 'none';
         document.getElementById('btnStream').classList.add('active');
@@ -761,10 +766,11 @@
     }
 
     function takeSnapshot() {
-        API = getAPI();
+        const espIP = prompt('Masukkan IP ESP32 (contoh: 192.168.1.x):');
+        if (!espIP) return;
         const img = document.getElementById('streamImg');
         const ph = document.getElementById('camPlaceholder');
-        img.src = `${API}/api/snapshot?t=${Date.now()}`;
+        img.src = `http://${espIP}/api/snapshot?t=${Date.now()}`;
         img.classList.add('active');
         ph.style.display = 'none';
         img.onerror = () => {
@@ -785,13 +791,12 @@
     }
 
     async function manualFeed() {
-        API = getAPI();
         const portion = parseInt(document.getElementById('portionSlider').value);
         const btn = document.getElementById('feedBtn');
         btn.disabled = true;
         btn.textContent = 'Memberi makan...';
         try {
-            const r = await fetch(`${API}/api/feed`, {
+            const r = await fetch(`${API}/api/feed/manual`, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({ portion }),
@@ -802,15 +807,15 @@
                 hideAlert();
                 loadHistory();
             } else {
-                showAlert('Feed gagal — device merespon tapi ada error', 'error');
+                showAlert('Feed gagal — server merespon tapi ada error', 'error');
                 showToast('feed gagal', 'error');
             }
         } catch (e) {
             if (e.name === 'TimeoutError') {
-                showAlert('Feed timeout — mungkin servo macet atau device tidak merespon', 'error');
+                showAlert('Feed timeout — server tidak merespon', 'error');
                 showToast('timeout', 'error');
             } else {
-                showAlert('Tidak bisa konek ke device — cek WiFi', 'error');
+                showAlert('Tidak bisa konek ke backend', 'error');
                 showToast('koneksi gagal', 'error');
             }
         }
@@ -822,27 +827,25 @@
             const r = await fetch(`${API}/api/schedules`, { signal: AbortSignal.timeout(5000) });
             const data = await r.json();
             const el = document.getElementById('scheduleList');
-            const active = data.filter(s => s.active || s.hour > 0);
-            if (!active.length) { el.innerHTML = '<p class="empty">belum ada jadwal</p>'; return; }
-            el.innerHTML = active.map(s => `
-      <div class="schedule-item">
-        <div>
-          <div class="schedule-time">${s.time}</div>
-          <div class="schedule-meta">${s.portion}s per porsi</div>
-        </div>
-        <div class="schedule-right">
-          <button class="del-btn" onclick="deleteSchedule(${s.id})">
-            <svg width="10" height="10" viewBox="0 0 10 10" fill="none"><path d="M2 2L8 8M8 2L2 8" stroke="#E24B4A" stroke-width="1.5" stroke-linecap="round"/></svg>
-          </button>
-          <div class="toggle ${s.active ? 'on' : ''}" onclick="toggleSchedule(${s.id}, this)"></div>
-        </div>
-      </div>
-    `).join('');
+            if (!data.length) { el.innerHTML = '<p class="empty">belum ada jadwal</p>'; return; }
+            el.innerHTML = data.map(s => `
+                <div class="schedule-item">
+                    <div>
+                        <div class="schedule-time">${s.time}</div>
+                        <div class="schedule-meta">${s.portion}s per porsi</div>
+                    </div>
+                    <div class="schedule-right">
+                        <button class="del-btn" onclick="deleteSchedule(${s.id})">
+                            <svg width="10" height="10" viewBox="0 0 10 10" fill="none"><path d="M2 2L8 8M8 2L2 8" stroke="#E24B4A" stroke-width="1.5" stroke-linecap="round"/></svg>
+                        </button>
+                        <div class="toggle ${s.is_active ? 'on' : ''}" onclick="toggleSchedule(${s.id}, this)"></div>
+                    </div>
+                </div>
+            `).join('');
         } catch { showAlert('Gagal load jadwal', 'warning'); }
     }
 
     async function addSchedule() {
-        API = getAPI();
         const time = document.getElementById('newTime').value;
         const portion = parseInt(document.getElementById('newPortion').value);
         if (!time || !portion) return;
@@ -862,8 +865,8 @@
         try {
             const r = await fetch(`${API}/api/schedules/${id}/toggle`, { method: 'PATCH', signal: AbortSignal.timeout(5000) });
             const data = await r.json();
-            el.classList.toggle('on', !!data.active);
-            showToast(data.active ? 'Jadwal aktif' : 'Jadwal dinonaktifkan');
+            el.classList.toggle('on', !!data.is_active);
+            showToast(data.is_active ? 'Jadwal aktif' : 'Jadwal dinonaktifkan');
         } catch { showToast('gagal', 'error'); }
     }
 
@@ -883,12 +886,18 @@
             const el = document.getElementById('historyList');
             if (!data.length) { el.innerHTML = '<p class="empty">belum ada history</p>'; return; }
             el.innerHTML = data.slice(0, 8).map(h => `
-      <div class="history-item">
-        <span class="hist-badge hist-${h.type}">${h.type}</span>
-        <span class="hist-portion">${h.portion}s</span>
-        <span class="hist-time">${fmtTime(h.triggered_at)}</span>
-      </div>
-    `).join('');
+                <div class="history-item">
+                    <span class="hist-badge hist-${h.type}">${h.type}</span>
+                    <span class="hist-portion">${h.portion}s</span>
+                    <span class="hist-time">${fmtTime(h.triggered_at)}</span>
+                </div>
+            `).join('');
         } catch { }
     }
+
+    // auto connect on load
+    window.addEventListener('load', () => {
+        document.getElementById('ipInput').value = API;
+        connectDevice();
+    });
 </script>
