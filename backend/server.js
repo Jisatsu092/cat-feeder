@@ -4,6 +4,7 @@ const app = express();
 const scheduleRoutes = require('./routes/scheduleRoutes');
 const feedRoutes = require('./routes/feedRoutes');
 const { loadSchedules } = require('./services/scheduler');
+const { initDb } = require('./models/db');
 
 app.use(express.json());
 
@@ -14,7 +15,7 @@ app.get('/', (req, res) => {
   res.send('Cat Feeder API Running');
 });
 
-app.listen(3000, () => {
-  console.log('Server running on port 3000');
-  loadSchedules(); // WAJIB
+initDb().then(() => {
+  loadSchedules();
+  app.listen(3000, () => console.log('[SERVER] Running on :3000'));
 });

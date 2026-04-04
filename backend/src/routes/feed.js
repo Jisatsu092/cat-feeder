@@ -1,8 +1,8 @@
 const express = require('express');
 const router = express.Router();
-const ctrl = require('../controllers/feedController');
+const { manualFeed, getHistory } = require('../controllers/feedController');
 
-router.post('/', ctrl.manualFeed);
-router.get('/history', ctrl.getHistory);
+router.post('/manual', manualFeed);
+router.get('/history', getHistory);
 
 module.exports = router;
