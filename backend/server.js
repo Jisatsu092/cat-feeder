@@ -1,10 +1,10 @@
 const express = require('express');
 const app = express();
 
-const scheduleRoutes = require('./routes/scheduleRoutes');
-const feedRoutes = require('./routes/feedRoutes');
-const { loadSchedules } = require('./services/scheduler');
-const { initDb } = require('./models/db');
+const scheduleRoutes = require('./src/routes/schedule');
+const feedRoutes = require('./src/routes/feed');
+const { loadSchedules } = require('./src/services/scheduler');
+const { initDb } = require('./src/models/db');
 
 app.use(express.json());
 
