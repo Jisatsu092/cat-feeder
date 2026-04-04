@@ -29,9 +29,11 @@ const createSchedule = (req, res) => {
   db.run(`INSERT INTO schedules (time, portion) VALUES (?, ?)`, [time, portion]);
   saveDb();
 
+  // ambil row terakhir langsung tanpa last_insert_rowid()
   const schedule = getOne(
     db,
-    `SELECT * FROM schedules WHERE id = last_insert_rowid()`
+    `SELECT * FROM schedules WHERE time = ? AND portion = ? ORDER BY id DESC LIMIT 1`,
+    [time, portion]
   );
 
   startSchedule(schedule);
