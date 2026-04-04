@@ -681,7 +681,7 @@
 <div class="toast" id="toast"></div>
 
 <script>
-    let API = 'https://criterion-bedroom-controller-alt.trycloudflare.com';
+    let API = '';
     let pingInterval = null;
 
     function getAPI() {
@@ -895,9 +895,18 @@
         } catch { }
     }
 
-    // auto connect on load
-    window.addEventListener('load', () => {
-        document.getElementById('ipInput').value = API;
-        connectDevice();
+    // auto-fetch tunnel URL saat load
+    window.addEventListener('load', async () => {
+        try {
+            const r = await fetch('/api/tunnel-url');
+            const data = await r.json();
+            if (data.url) {
+                API = data.url;
+                document.getElementById('ipInput').value = data.url;
+                connectDevice();
+            }
+        } catch {
+            setStatus('offline', 'offline');
+        }
     });
-</script>
+</script>   
