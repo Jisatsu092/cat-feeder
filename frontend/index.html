@@ -1,834 +1,991 @@
-<link rel="manifest" href="manifest.json">
-<meta name="theme-color" content="#ffffff">
-<meta name="viewport" content="width=device-width, initial-scale=1">
-
-
+<link rel="manifest" href="manifest.json" />
+<meta name="theme-color" content="#ffffff" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
 
 <style>
-    @import url('https://fonts.googleapis.com/css2?family=Nunito:wght@400;500;600;700&display=swap');
-
-    * {
-        box-sizing: border-box;
-        margin: 0;
-        padding: 0
-    }
-
-    .app {
-        max-width: 420px;
-        margin: 0 auto;
-        padding: 1rem;
-        font-family: 'Nunito', sans-serif;
-        color: var(--color-text-primary)
-    }
-
-    .header {
-        padding: 1.25rem 0 1rem;
-        margin-bottom: 1rem
-    }
-
-    .header-top {
-        display: flex;
-        align-items: center;
-        justify-content: space-between
-    }
-
-    .app-title {
-        font-size: 22px;
-        font-weight: 700;
-        color: var(--color-text-primary)
-    }
-
-    .app-title span {
-        color: #D4537E
-    }
-
-    .status-pill {
-        display: flex;
-        align-items: center;
-        gap: 6px;
-        padding: 5px 12px;
-        border-radius: 20px;
-        font-size: 12px;
-        font-weight: 600;
-        border: 0.5px solid
-    }
-
-    .status-pill.online {
-        background: #EAF3DE;
-        color: #27500A;
-        border-color: #97C459
-    }
-
-    .status-pill.offline {
-        background: #FCEBEB;
-        color: #791F1F;
-        border-color: #F09595
-    }
-
-    .status-pill.connecting {
-        background: #FAEEDA;
-        color: #633806;
-        border-color: #EF9F27
-    }
-
-    .status-dot {
-        width: 7px;
-        height: 7px;
-        border-radius: 50%;
-        flex-shrink: 0
-    }
-
-    .online .status-dot {
-        background: #3B6D11
-    }
-
-    .offline .status-dot {
-        background: #E24B4A
-    }
-
-    .connecting .status-dot {
-        background: #BA7517
-    }
-
-    .status-time {
-        font-size: 12px;
-        color: var(--color-text-tertiary);
-        margin-top: 4px
-    }
-
-    .alert-banner {
-        display: none;
-        padding: 10px 14px;
-        border-radius: var(--border-radius-md);
-        font-size: 13px;
-        font-weight: 600;
-        margin-bottom: 12px;
-        border: 0.5px solid
-    }
-
-    .alert-banner.error {
-        display: flex;
-        align-items: center;
-        gap: 8px;
-        background: #FCEBEB;
-        color: #791F1F;
-        border-color: #F09595
-    }
-
-    .alert-banner.warning {
-        display: flex;
-        align-items: center;
-        gap: 8px;
-        background: #FAEEDA;
-        color: #633806;
-        border-color: #EF9F27
-    }
-
-    .alert-banner.success {
-        display: flex;
-        align-items: center;
-        gap: 8px;
-        background: #EAF3DE;
-        color: #27500A;
-        border-color: #97C459
-    }
-
-    .alert-icon {
-        width: 16px;
-        height: 16px;
-        flex-shrink: 0
-    }
-
-    .card {
-        background: var(--color-background-primary);
-        border: 0.5px solid var(--color-border-tertiary);
-        border-radius: var(--border-radius-lg);
-        padding: 1rem 1.25rem;
-        margin-bottom: 12px
-    }
-
-    .card-header {
-        display: flex;
-        align-items: center;
-        gap: 8px;
-        margin-bottom: 12px
-    }
-
-    .card-icon {
-        width: 32px;
-        height: 32px;
-        border-radius: 10px;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        flex-shrink: 0
-    }
-
-    .card-icon.pink {
-        background: #FBEAF0
-    }
-
-    .card-icon.teal {
-        background: #E1F5EE
-    }
-
-    .card-icon.amber {
-        background: #FAEEDA
-    }
-
-    .card-icon.blue {
-        background: #E6F1FB
-    }
-
-    .card-label {
-        font-size: 13px;
-        font-weight: 700;
-        color: var(--color-text-secondary);
-        letter-spacing: 0.03em
-    }
-
-    .ip-row {
-        display: flex;
-        gap: 8px;
-        margin-bottom: 8px
-    }
-
-    .ip-row input {
-        flex: 1;
-        font-family: 'Nunito', sans-serif;
-        font-size: 13px;
-        padding: 8px 12px;
-        background: var(--color-background-secondary);
-        border: 0.5px solid var(--color-border-tertiary);
-        border-radius: var(--border-radius-md);
-        color: var(--color-text-primary)
-    }
-
-    .btn-connect {
-        font-family: 'Nunito', sans-serif;
-        font-size: 13px;
-        font-weight: 700;
-        padding: 8px 16px;
-        background: #D4537E;
-        color: #fff;
-        border: none;
-        border-radius: var(--border-radius-md);
-        cursor: pointer
-    }
-
-    .btn-connect:hover {
-        background: #993556
-    }
-
-    .hint {
-        font-size: 11px;
-        color: var(--color-text-tertiary)
-    }
-
-    .camera-box {
-        width: 100%;
-        aspect-ratio: 4/3;
-        background: #F1EFE8;
-        border-radius: var(--border-radius-md);
-        overflow: hidden;
-        position: relative;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        margin-bottom: 10px
-    }
-
-    .camera-box img {
-        width: 100%;
-        height: 100%;
-        object-fit: cover;
-        display: none
-    }
-
-    .camera-box img.active {
-        display: block
-    }
-
-    .cam-placeholder {
-        display: flex;
-        flex-direction: column;
-        align-items: center;
-        gap: 8px
-    }
-
-    .cam-placeholder-text {
-        font-size: 12px;
-        color: var(--color-text-tertiary);
-        font-weight: 600
-    }
-
-    .cam-controls {
-        display: grid;
-        grid-template-columns: 1fr 1fr 1fr;
-        gap: 8px
-    }
-
-    .cam-btn {
-        font-family: 'Nunito', sans-serif;
-        font-size: 12px;
-        font-weight: 700;
-        padding: 8px;
-        border-radius: var(--border-radius-md);
-        cursor: pointer;
-        border: 0.5px solid var(--color-border-secondary);
-        background: var(--color-background-secondary);
-        color: var(--color-text-primary)
-    }
-
-    .cam-btn:hover {
-        background: var(--color-background-primary)
-    }
-
-    .cam-btn.active {
-        background: #E1F5EE;
-        color: #085041;
-        border-color: #5DCAA5
-    }
-
-    .feed-btn {
-        width: 100%;
-        padding: 14px;
-        font-family: 'Nunito', sans-serif;
-        font-size: 15px;
-        font-weight: 700;
-        background: #D4537E;
-        color: #fff;
-        border: none;
-        border-radius: var(--border-radius-md);
-        cursor: pointer;
-        letter-spacing: 0.02em;
-        transition: background 0.15s, transform 0.1s
-    }
-
-    .feed-btn:active {
-        transform: scale(0.98);
-        background: #993556
-    }
-
-    .feed-btn:disabled {
-        background: #B4B2A9;
-        cursor: not-allowed
-    }
-
-    .portion-row {
-        display: flex;
-        align-items: center;
-        gap: 12px;
-        margin-top: 12px
-    }
-
-    .portion-label {
-        font-size: 12px;
-        font-weight: 600;
-        color: var(--color-text-secondary);
-        white-space: nowrap
-    }
-
-    .portion-val {
-        font-size: 13px;
-        font-weight: 700;
-        min-width: 28px;
-        text-align: right;
-        color: #D4537E
-    }
-
-    .schedule-item {
-        display: flex;
-        align-items: center;
-        justify-content: space-between;
-        padding: 10px 0;
-        border-bottom: 0.5px solid var(--color-border-tertiary)
-    }
-
-    .schedule-item:last-child {
-        border-bottom: none;
-        padding-bottom: 0
-    }
-
-    .schedule-time {
-        font-size: 20px;
-        font-weight: 700
-    }
-
-    .schedule-meta {
-        font-size: 11px;
-        color: var(--color-text-tertiary);
-        margin-top: 2px;
-        font-weight: 600
-    }
-
-    .schedule-right {
-        display: flex;
-        align-items: center;
-        gap: 10px
-    }
-
-    .del-btn {
-        width: 24px;
-        height: 24px;
-        border-radius: 50%;
-        background: #FCEBEB;
-        border: none;
-        cursor: pointer;
-        display: flex;
-        align-items: center;
-        justify-content: center
-    }
-
-    .del-btn:hover {
-        background: #F09595
-    }
-
-    .toggle {
-        width: 38px;
-        height: 22px;
-        border-radius: 11px;
-        border: 0.5px solid var(--color-border-secondary);
-        background: var(--color-background-secondary);
-        cursor: pointer;
-        position: relative;
-        transition: background 0.2s;
-        flex-shrink: 0
-    }
-
-    .toggle.on {
-        background: #D4537E;
-        border-color: #D4537E
-    }
-
-    .toggle::after {
-        content: '';
-        position: absolute;
-        top: 3px;
-        left: 3px;
-        width: 14px;
-        height: 14px;
-        border-radius: 50%;
-        background: #fff;
-        transition: transform 0.2s
-    }
-
-    .toggle.on::after {
-        transform: translateX(16px)
-    }
-
-    .add-row {
-        display: grid;
-        grid-template-columns: 1fr 72px auto;
-        gap: 8px;
-        margin-top: 12px
-    }
-
-    .add-row input {
-        font-family: 'Nunito', sans-serif;
-        font-size: 13px;
-        padding: 8px 10px;
-        background: var(--color-background-secondary);
-        border: 0.5px solid var(--color-border-tertiary);
-        border-radius: var(--border-radius-md);
-        color: var(--color-text-primary)
-    }
-
-    .btn-add {
-        font-family: 'Nunito', sans-serif;
-        font-size: 13px;
-        font-weight: 700;
-        padding: 8px 14px;
-        background: #EEEDFE;
-        color: #3C3489;
-        border: 0.5px solid #AFA9EC;
-        border-radius: var(--border-radius-md);
-        cursor: pointer;
-        white-space: nowrap
-    }
-
-    .btn-add:hover {
-        background: #CECBF6
-    }
-
-    .history-item {
-        display: flex;
-        align-items: center;
-        justify-content: space-between;
-        padding: 8px 0;
-        border-bottom: 0.5px solid var(--color-border-tertiary)
-    }
-
-    .history-item:last-child {
-        border-bottom: none
-    }
-
-    .hist-badge {
-        font-size: 11px;
-        font-weight: 700;
-        padding: 3px 9px;
-        border-radius: 20px
-    }
-
-    .hist-manual {
-        background: #FBEAF0;
-        color: #72243E
-    }
-
-    .hist-schedule {
-        background: #E1F5EE;
-        color: #085041
-    }
-
-    .hist-time {
-        font-size: 11px;
-        color: var(--color-text-tertiary);
-        font-weight: 600
-    }
-
-    .hist-portion {
-        font-size: 13px;
-        font-weight: 700;
-        color: var(--color-text-secondary)
-    }
-
-    .empty {
-        font-size: 13px;
-        color: var(--color-text-tertiary);
-        padding: 10px 0;
-        font-weight: 600
-    }
-
-    .toast {
-        position: fixed;
-        bottom: 24px;
-        left: 50%;
-        transform: translateX(-50%);
-        padding: 10px 20px;
-        border-radius: 20px;
-        font-size: 13px;
-        font-weight: 700;
-        opacity: 0;
-        transition: opacity 0.2s;
-        pointer-events: none;
-        white-space: nowrap;
-        z-index: 99;
-        font-family: 'Nunito', sans-serif
-    }
-
-    .toast.success {
-        background: #EAF3DE;
-        color: #27500A;
-        border: 0.5px solid #97C459
-    }
-
-    .toast.error {
-        background: #FCEBEB;
-        color: #791F1F;
-        border: 0.5px solid #F09595
-    }
-
-    .toast.show {
-        opacity: 1
-    }
+  @import url("https://fonts.googleapis.com/css2?family=Nunito:wght@400;500;600;700&display=swap");
+
+  * {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+  }
+
+  .app {
+    max-width: 420px;
+    margin: 0 auto;
+    padding: 1rem;
+    font-family: "Nunito", sans-serif;
+    color: var(--color-text-primary);
+  }
+
+  .header {
+    padding: 1.25rem 0 1rem;
+    margin-bottom: 1rem;
+  }
+
+  .header-top {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+  }
+
+  .app-title {
+    font-size: 22px;
+    font-weight: 700;
+    color: var(--color-text-primary);
+  }
+
+  .app-title span {
+    color: #d4537e;
+  }
+
+  .status-pill {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    padding: 5px 12px;
+    border-radius: 20px;
+    font-size: 12px;
+    font-weight: 600;
+    border: 0.5px solid;
+  }
+
+  .status-pill.online {
+    background: #eaf3de;
+    color: #27500a;
+    border-color: #97c459;
+  }
+
+  .status-pill.offline {
+    background: #fcebeb;
+    color: #791f1f;
+    border-color: #f09595;
+  }
+
+  .status-pill.connecting {
+    background: #faeeda;
+    color: #633806;
+    border-color: #ef9f27;
+  }
+
+  .status-dot {
+    width: 7px;
+    height: 7px;
+    border-radius: 50%;
+    flex-shrink: 0;
+  }
+
+  .online .status-dot {
+    background: #3b6d11;
+  }
+
+  .offline .status-dot {
+    background: #e24b4a;
+  }
+
+  .connecting .status-dot {
+    background: #ba7517;
+  }
+
+  .status-time {
+    font-size: 12px;
+    color: var(--color-text-tertiary);
+    margin-top: 4px;
+  }
+
+  .alert-banner {
+    display: none;
+    padding: 10px 14px;
+    border-radius: var(--border-radius-md);
+    font-size: 13px;
+    font-weight: 600;
+    margin-bottom: 12px;
+    border: 0.5px solid;
+  }
+
+  .alert-banner.error {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    background: #fcebeb;
+    color: #791f1f;
+    border-color: #f09595;
+  }
+
+  .alert-banner.warning {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    background: #faeeda;
+    color: #633806;
+    border-color: #ef9f27;
+  }
+
+  .alert-banner.success {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    background: #eaf3de;
+    color: #27500a;
+    border-color: #97c459;
+  }
+
+  .alert-icon {
+    width: 16px;
+    height: 16px;
+    flex-shrink: 0;
+  }
+
+  .card {
+    background: var(--color-background-primary);
+    border: 0.5px solid var(--color-border-tertiary);
+    border-radius: var(--border-radius-lg);
+    padding: 1rem 1.25rem;
+    margin-bottom: 12px;
+  }
+
+  .card-header {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin-bottom: 12px;
+  }
+
+  .card-icon {
+    width: 32px;
+    height: 32px;
+    border-radius: 10px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+  }
+
+  .card-icon.pink {
+    background: #fbeaf0;
+  }
+
+  .card-icon.teal {
+    background: #e1f5ee;
+  }
+
+  .card-icon.amber {
+    background: #faeeda;
+  }
+
+  .card-icon.blue {
+    background: #e6f1fb;
+  }
+
+  .card-label {
+    font-size: 13px;
+    font-weight: 700;
+    color: var(--color-text-secondary);
+    letter-spacing: 0.03em;
+  }
+
+  .ip-row {
+    display: flex;
+    gap: 8px;
+    margin-bottom: 8px;
+  }
+
+  .ip-row input {
+    flex: 1;
+    font-family: "Nunito", sans-serif;
+    font-size: 13px;
+    padding: 8px 12px;
+    background: var(--color-background-secondary);
+    border: 0.5px solid var(--color-border-tertiary);
+    border-radius: var(--border-radius-md);
+    color: var(--color-text-primary);
+  }
+
+  .btn-connect {
+    font-family: "Nunito", sans-serif;
+    font-size: 13px;
+    font-weight: 700;
+    padding: 8px 16px;
+    background: #d4537e;
+    color: #fff;
+    border: none;
+    border-radius: var(--border-radius-md);
+    cursor: pointer;
+  }
+
+  .btn-connect:hover {
+    background: #993556;
+  }
+
+  .hint {
+    font-size: 11px;
+    color: var(--color-text-tertiary);
+  }
+
+  .camera-box {
+    width: 100%;
+    aspect-ratio: 4/3;
+    background: #f1efe8;
+    border-radius: var(--border-radius-md);
+    overflow: hidden;
+    position: relative;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-bottom: 10px;
+  }
+
+  .camera-box img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    display: none;
+  }
+
+  .camera-box img.active {
+    display: block;
+  }
+
+  .cam-placeholder {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 8px;
+  }
+
+  .cam-placeholder-text {
+    font-size: 12px;
+    color: var(--color-text-tertiary);
+    font-weight: 600;
+  }
+
+  .cam-controls {
+    display: grid;
+    grid-template-columns: 1fr 1fr 1fr;
+    gap: 8px;
+  }
+
+  .cam-btn {
+    font-family: "Nunito", sans-serif;
+    font-size: 12px;
+    font-weight: 700;
+    padding: 8px;
+    border-radius: var(--border-radius-md);
+    cursor: pointer;
+    border: 0.5px solid var(--color-border-secondary);
+    background: var(--color-background-secondary);
+    color: var(--color-text-primary);
+  }
+
+  .cam-btn:hover {
+    background: var(--color-background-primary);
+  }
+
+  .cam-btn.active {
+    background: #e1f5ee;
+    color: #085041;
+    border-color: #5dcaa5;
+  }
+
+  .feed-btn {
+    width: 100%;
+    padding: 14px;
+    font-family: "Nunito", sans-serif;
+    font-size: 15px;
+    font-weight: 700;
+    background: #d4537e;
+    color: #fff;
+    border: none;
+    border-radius: var(--border-radius-md);
+    cursor: pointer;
+    letter-spacing: 0.02em;
+    transition:
+      background 0.15s,
+      transform 0.1s;
+  }
+
+  .feed-btn:active {
+    transform: scale(0.98);
+    background: #993556;
+  }
+
+  .feed-btn:disabled {
+    background: #b4b2a9;
+    cursor: not-allowed;
+  }
+
+  .portion-row {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    margin-top: 12px;
+  }
+
+  .portion-label {
+    font-size: 12px;
+    font-weight: 600;
+    color: var(--color-text-secondary);
+    white-space: nowrap;
+  }
+
+  .portion-val {
+    font-size: 13px;
+    font-weight: 700;
+    min-width: 28px;
+    text-align: right;
+    color: #d4537e;
+  }
+
+  .schedule-item {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 10px 0;
+    border-bottom: 0.5px solid var(--color-border-tertiary);
+  }
+
+  .schedule-item:last-child {
+    border-bottom: none;
+    padding-bottom: 0;
+  }
+
+  .schedule-time {
+    font-size: 20px;
+    font-weight: 700;
+  }
+
+  .schedule-meta {
+    font-size: 11px;
+    color: var(--color-text-tertiary);
+    margin-top: 2px;
+    font-weight: 600;
+  }
+
+  .schedule-right {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+
+  .del-btn {
+    width: 24px;
+    height: 24px;
+    border-radius: 50%;
+    background: #fcebeb;
+    border: none;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  .del-btn:hover {
+    background: #f09595;
+  }
+
+  .toggle {
+    width: 38px;
+    height: 22px;
+    border-radius: 11px;
+    border: 0.5px solid var(--color-border-secondary);
+    background: var(--color-background-secondary);
+    cursor: pointer;
+    position: relative;
+    transition: background 0.2s;
+    flex-shrink: 0;
+  }
+
+  .toggle.on {
+    background: #d4537e;
+    border-color: #d4537e;
+  }
+
+  .toggle::after {
+    content: "";
+    position: absolute;
+    top: 3px;
+    left: 3px;
+    width: 14px;
+    height: 14px;
+    border-radius: 50%;
+    background: #fff;
+    transition: transform 0.2s;
+  }
+
+  .toggle.on::after {
+    transform: translateX(16px);
+  }
+
+  .add-row {
+    display: grid;
+    grid-template-columns: 1fr 72px auto;
+    gap: 8px;
+    margin-top: 12px;
+  }
+
+  .add-row input {
+    font-family: "Nunito", sans-serif;
+    font-size: 13px;
+    padding: 8px 10px;
+    background: var(--color-background-secondary);
+    border: 0.5px solid var(--color-border-tertiary);
+    border-radius: var(--border-radius-md);
+    color: var(--color-text-primary);
+  }
+
+  .btn-add {
+    font-family: "Nunito", sans-serif;
+    font-size: 13px;
+    font-weight: 700;
+    padding: 8px 14px;
+    background: #eeedfe;
+    color: #3c3489;
+    border: 0.5px solid #afa9ec;
+    border-radius: var(--border-radius-md);
+    cursor: pointer;
+    white-space: nowrap;
+  }
+
+  .btn-add:hover {
+    background: #cecbf6;
+  }
+
+  .history-item {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 8px 0;
+    border-bottom: 0.5px solid var(--color-border-tertiary);
+  }
+
+  .history-item:last-child {
+    border-bottom: none;
+  }
+
+  .hist-badge {
+    font-size: 11px;
+    font-weight: 700;
+    padding: 3px 9px;
+    border-radius: 20px;
+  }
+
+  .hist-manual {
+    background: #fbeaf0;
+    color: #72243e;
+  }
+
+  .hist-schedule {
+    background: #e1f5ee;
+    color: #085041;
+  }
+
+  .hist-time {
+    font-size: 11px;
+    color: var(--color-text-tertiary);
+    font-weight: 600;
+  }
+
+  .hist-portion {
+    font-size: 13px;
+    font-weight: 700;
+    color: var(--color-text-secondary);
+  }
+
+  .empty {
+    font-size: 13px;
+    color: var(--color-text-tertiary);
+    padding: 10px 0;
+    font-weight: 600;
+  }
+
+  .toast {
+    position: fixed;
+    bottom: 24px;
+    left: 50%;
+    transform: translateX(-50%);
+    padding: 10px 20px;
+    border-radius: 20px;
+    font-size: 13px;
+    font-weight: 700;
+    opacity: 0;
+    transition: opacity 0.2s;
+    pointer-events: none;
+    white-space: nowrap;
+    z-index: 99;
+    font-family: "Nunito", sans-serif;
+  }
+
+  .toast.success {
+    background: #eaf3de;
+    color: #27500a;
+    border: 0.5px solid #97c459;
+  }
+
+  .toast.error {
+    background: #fcebeb;
+    color: #791f1f;
+    border: 0.5px solid #f09595;
+  }
+
+  .toast.show {
+    opacity: 1;
+  }
 </style>
 
 <div class="app">
-
-    <div class="header">
-        <div class="header-top">
-            <div class="app-title">Makan<span>.</span></div>
-            <div class="status-pill connecting" id="statusPill">
-                <div class="status-dot"></div>
-                <span id="statusLabel">connecting</span>
-            </div>
-        </div>
-        <div class="status-time" id="statusTime"></div>
+  <div class="header">
+    <div class="header-top">
+      <div class="app-title">Makan<span>.</span></div>
+      <div class="status-pill connecting" id="statusPill">
+        <div class="status-dot"></div>
+        <span id="statusLabel">connecting</span>
+      </div>
     </div>
+    <div class="status-time" id="statusTime"></div>
+  </div>
 
-    <div class="alert-banner" id="alertBanner">
-        <svg class="alert-icon" viewBox="0 0 16 16" fill="none">
-            <path d="M8 1L15 14H1L8 1Z" stroke="currentColor" stroke-width="1.5" stroke-linejoin="round" />
-            <path d="M8 6V9" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" />
-            <circle cx="8" cy="11.5" r="0.75" fill="currentColor" />
+  <div class="alert-banner" id="alertBanner">
+    <svg class="alert-icon" viewBox="0 0 16 16" fill="none">
+      <path
+        d="M8 1L15 14H1L8 1Z"
+        stroke="currentColor"
+        stroke-width="1.5"
+        stroke-linejoin="round"
+      />
+      <path
+        d="M8 6V9"
+        stroke="currentColor"
+        stroke-width="1.5"
+        stroke-linecap="round"
+      />
+      <circle cx="8" cy="11.5" r="0.75" fill="currentColor" />
+    </svg>
+    <span id="alertText"></span>
+  </div>
+
+  <div class="card">
+    <div class="card-header">
+      <div class="card-icon blue">
+        <svg width="18" height="18" viewBox="0 0 18 18" fill="none">
+          <circle cx="9" cy="9" r="7" stroke="#185FA5" stroke-width="1.5" />
+          <path
+            d="M9 5V9L11.5 11.5"
+            stroke="#185FA5"
+            stroke-width="1.5"
+            stroke-linecap="round"
+          />
         </svg>
-        <span id="alertText"></span>
+      </div>
+      <span class="card-label">device</span>
     </div>
-
-    <div class="card">
-        <div class="card-header">
-            <div class="card-icon blue">
-                <svg width="18" height="18" viewBox="0 0 18 18" fill="none">
-                    <circle cx="9" cy="9" r="7" stroke="#185FA5" stroke-width="1.5" />
-                    <path d="M9 5V9L11.5 11.5" stroke="#185FA5" stroke-width="1.5" stroke-linecap="round" />
-                </svg>
-            </div>
-            <span class="card-label">device</span>
-        </div>
-        <div class="ip-row">
-            <input type="text" id="ipInput" placeholder="https://xxx.trycloudflare.com" value="">
-            <div class="hint">URL tunnel atau IP ESP32 langsung</div>
-        </div>
-        <div class="hint">IP ESP32 — cek Serial Monitor saat hardware nyala</div>
+    <div class="ip-row">
+      <input
+        type="text"
+        id="ipInput"
+        placeholder="https://xxx.trycloudflare.com"
+        value=""
+      />
+      <div class="hint">URL tunnel atau IP ESP32 langsung</div>
     </div>
+    <div class="hint">IP ESP32 — cek Serial Monitor saat hardware nyala</div>
+  </div>
 
-    <div class="card">
-        <div class="card-header">
-            <div class="card-icon teal">
-                <svg width="18" height="18" viewBox="0 0 18 18" fill="none">
-                    <rect x="2" y="3" width="14" height="11" rx="2" stroke="#0F6E56" stroke-width="1.5" />
-                    <path d="M6 7.5L8.5 10L12 6" stroke="#0F6E56" stroke-width="1.5" stroke-linecap="round"
-                        stroke-linejoin="round" />
-                </svg>
-            </div>
-            <span class="card-label">camera</span>
-        </div>
-        <div class="camera-box" id="cameraBox">
-            <img id="streamImg" alt="stream">
-            <div class="cam-placeholder" id="camPlaceholder">
-                <svg width="32" height="32" viewBox="0 0 32 32" fill="none">
-                    <rect x="2" y="7" width="28" height="20" rx="3" stroke="#B4B2A9" stroke-width="1.5" />
-                    <circle cx="16" cy="17" r="5" stroke="#B4B2A9" stroke-width="1.5" />
-                    <path d="M12 7L10 4H22L20 7" stroke="#B4B2A9" stroke-width="1.5" stroke-linejoin="round" />
-                </svg>
-                <div class="cam-placeholder-text">camera offline</div>
-            </div>
-        </div>
-        <div class="cam-controls">
-            <button class="cam-btn" id="btnStream" onclick="startStream()">
-                <svg width="14" height="14" viewBox="0 0 14 14" fill="none"
-                    style="display:inline;vertical-align:middle;margin-right:4px">
-                    <circle cx="7" cy="7" r="5" stroke="currentColor" stroke-width="1.2" />
-                    <circle cx="7" cy="7" r="2" fill="currentColor" />
-                </svg>
-                live
-            </button>
-            <button class="cam-btn" onclick="takeSnapshot()">
-                <svg width="14" height="14" viewBox="0 0 14 14" fill="none"
-                    style="display:inline;vertical-align:middle;margin-right:4px">
-                    <rect x="1" y="3" width="12" height="9" rx="1.5" stroke="currentColor" stroke-width="1.2" />
-                    <circle cx="7" cy="7.5" r="2" stroke="currentColor" stroke-width="1.2" />
-                </svg>
-                foto
-            </button>
-            <button class="cam-btn" onclick="stopStream()">
-                <svg width="14" height="14" viewBox="0 0 14 14" fill="none"
-                    style="display:inline;vertical-align:middle;margin-right:4px">
-                    <rect x="3" y="3" width="8" height="8" rx="1" stroke="currentColor" stroke-width="1.2" />
-                </svg>
-                stop
-            </button>
-        </div>
+  <div class="card">
+    <div class="card-header">
+      <div class="card-icon teal">
+        <svg width="18" height="18" viewBox="0 0 18 18" fill="none">
+          <rect
+            x="2"
+            y="3"
+            width="14"
+            height="11"
+            rx="2"
+            stroke="#0F6E56"
+            stroke-width="1.5"
+          />
+          <path
+            d="M6 7.5L8.5 10L12 6"
+            stroke="#0F6E56"
+            stroke-width="1.5"
+            stroke-linecap="round"
+            stroke-linejoin="round"
+          />
+        </svg>
+      </div>
+      <span class="card-label">camera</span>
     </div>
-
-    <div class="card">
-        <div class="card-header">
-            <div class="card-icon pink">
-                <svg width="18" height="18" viewBox="0 0 18 18" fill="none">
-                    <path d="M9 2C9 2 4 6 4 10.5C4 13.5 6.24 16 9 16C11.76 16 14 13.5 14 10.5C14 6 9 2 9 2Z"
-                        stroke="#993556" stroke-width="1.5" stroke-linejoin="round" />
-                </svg>
-            </div>
-            <span class="card-label">feed now</span>
-        </div>
-        <button class="feed-btn" id="feedBtn" onclick="manualFeed()">Feed sekarang</button>
-        <div class="portion-row">
-            <span class="portion-label">porsi</span>
-            <input type="range" min="1" max="10" value="3" step="1" id="portionSlider"
-                oninput="document.getElementById('portionVal').textContent=this.value+'s'" style="flex:1">
-            <span class="portion-val" id="portionVal">3s</span>
-        </div>
+    <div class="camera-box" id="cameraBox">
+      <img id="streamImg" alt="stream" />
+      <div class="cam-placeholder" id="camPlaceholder">
+        <svg width="32" height="32" viewBox="0 0 32 32" fill="none">
+          <rect
+            x="2"
+            y="7"
+            width="28"
+            height="20"
+            rx="3"
+            stroke="#B4B2A9"
+            stroke-width="1.5"
+          />
+          <circle cx="16" cy="17" r="5" stroke="#B4B2A9" stroke-width="1.5" />
+          <path
+            d="M12 7L10 4H22L20 7"
+            stroke="#B4B2A9"
+            stroke-width="1.5"
+            stroke-linejoin="round"
+          />
+        </svg>
+        <div class="cam-placeholder-text">camera offline</div>
+      </div>
     </div>
-
-    <div class="card">
-        <div class="card-header">
-            <div class="card-icon amber">
-                <svg width="18" height="18" viewBox="0 0 18 18" fill="none">
-                    <circle cx="9" cy="9" r="7" stroke="#854F0B" stroke-width="1.5" />
-                    <path d="M9 5V9" stroke="#854F0B" stroke-width="1.5" stroke-linecap="round" />
-                    <path d="M9 9L12 12" stroke="#854F0B" stroke-width="1.5" stroke-linecap="round" />
-                </svg>
-            </div>
-            <span class="card-label">jadwal</span>
-        </div>
-        <div id="scheduleList">
-            <p class="empty">belum ada jadwal</p>
-        </div>
-        <div class="add-row">
-            <input type="time" id="newTime" value="07:00">
-            <input type="number" id="newPortion" min="1" max="10" value="3" placeholder="detik">
-            <button class="btn-add" onclick="addSchedule()">+ tambah</button>
-        </div>
+    <div class="cam-controls">
+      <button class="cam-btn" id="btnStream" onclick="startStream()">
+        <svg
+          width="14"
+          height="14"
+          viewBox="0 0 14 14"
+          fill="none"
+          style="display: inline; vertical-align: middle; margin-right: 4px"
+        >
+          <circle
+            cx="7"
+            cy="7"
+            r="5"
+            stroke="currentColor"
+            stroke-width="1.2"
+          />
+          <circle cx="7" cy="7" r="2" fill="currentColor" />
+        </svg>
+        live
+      </button>
+      <button class="cam-btn" onclick="takeSnapshot()">
+        <svg
+          width="14"
+          height="14"
+          viewBox="0 0 14 14"
+          fill="none"
+          style="display: inline; vertical-align: middle; margin-right: 4px"
+        >
+          <rect
+            x="1"
+            y="3"
+            width="12"
+            height="9"
+            rx="1.5"
+            stroke="currentColor"
+            stroke-width="1.2"
+          />
+          <circle
+            cx="7"
+            cy="7.5"
+            r="2"
+            stroke="currentColor"
+            stroke-width="1.2"
+          />
+        </svg>
+        foto
+      </button>
+      <button class="cam-btn" onclick="stopStream()">
+        <svg
+          width="14"
+          height="14"
+          viewBox="0 0 14 14"
+          fill="none"
+          style="display: inline; vertical-align: middle; margin-right: 4px"
+        >
+          <rect
+            x="3"
+            y="3"
+            width="8"
+            height="8"
+            rx="1"
+            stroke="currentColor"
+            stroke-width="1.2"
+          />
+        </svg>
+        stop
+      </button>
     </div>
+  </div>
 
-    <div class="card">
-        <div class="card-header">
-            <div class="card-icon blue">
-                <svg width="18" height="18" viewBox="0 0 18 18" fill="none">
-                    <path d="M3 14L3 10M7 14L7 7M11 14L11 4M15 14L15 9" stroke="#185FA5" stroke-width="1.5"
-                        stroke-linecap="round" />
-                </svg>
-            </div>
-            <span class="card-label">history</span>
-        </div>
-        <div id="historyList">
-            <p class="empty">belum ada history</p>
-        </div>
+  <div class="card">
+    <div class="card-header">
+      <div class="card-icon pink">
+        <svg width="18" height="18" viewBox="0 0 18 18" fill="none">
+          <path
+            d="M9 2C9 2 4 6 4 10.5C4 13.5 6.24 16 9 16C11.76 16 14 13.5 14 10.5C14 6 9 2 9 2Z"
+            stroke="#993556"
+            stroke-width="1.5"
+            stroke-linejoin="round"
+          />
+        </svg>
+      </div>
+      <span class="card-label">feed now</span>
     </div>
+    <button class="feed-btn" id="feedBtn" onclick="manualFeed()">
+      Feed sekarang
+    </button>
+    <div class="portion-row">
+      <span class="portion-label">porsi</span>
+      <input
+        type="range"
+        min="1"
+        max="10"
+        value="3"
+        step="1"
+        id="portionSlider"
+        oninput="
+          document.getElementById('portionVal').textContent = this.value + 's'
+        "
+        style="flex: 1"
+      />
+      <span class="portion-val" id="portionVal">3s</span>
+    </div>
+  </div>
 
+  <div class="card">
+    <div class="card-header">
+      <div class="card-icon amber">
+        <svg width="18" height="18" viewBox="0 0 18 18" fill="none">
+          <circle cx="9" cy="9" r="7" stroke="#854F0B" stroke-width="1.5" />
+          <path
+            d="M9 5V9"
+            stroke="#854F0B"
+            stroke-width="1.5"
+            stroke-linecap="round"
+          />
+          <path
+            d="M9 9L12 12"
+            stroke="#854F0B"
+            stroke-width="1.5"
+            stroke-linecap="round"
+          />
+        </svg>
+      </div>
+      <span class="card-label">jadwal</span>
+    </div>
+    <div id="scheduleList">
+      <p class="empty">belum ada jadwal</p>
+    </div>
+    <div class="add-row">
+      <input type="time" id="newTime" value="07:00" />
+      <input
+        type="number"
+        id="newPortion"
+        min="1"
+        max="10"
+        value="3"
+        placeholder="detik"
+      />
+      <button class="btn-add" onclick="addSchedule()">+ tambah</button>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="card-header">
+      <div class="card-icon blue">
+        <svg width="18" height="18" viewBox="0 0 18 18" fill="none">
+          <path
+            d="M3 14L3 10M7 14L7 7M11 14L11 4M15 14L15 9"
+            stroke="#185FA5"
+            stroke-width="1.5"
+            stroke-linecap="round"
+          />
+        </svg>
+      </div>
+      <span class="card-label">history</span>
+    </div>
+    <div id="historyList">
+      <p class="empty">belum ada history</p>
+    </div>
+  </div>
 </div>
 
 <div class="toast" id="toast"></div>
 
 <script>
-    let API = '';
-    let pingInterval = null;
+  let API = "";
+  let pingInterval = null;
 
-    function getAPI() {
-        return document.getElementById('ipInput').value.trim().replace(/\/$/, '');
+  function getAPI() {
+    return document.getElementById("ipInput").value.trim().replace(/\/$/, "");
+  }
+
+  function showToast(msg, type = "success") {
+    const t = document.getElementById("toast");
+    t.textContent = msg;
+    t.className = "toast " + type + " show";
+    setTimeout(() => t.classList.remove("show"), 2500);
+  }
+
+  function showAlert(msg, type = "error") {
+    const b = document.getElementById("alertBanner");
+    const tx = document.getElementById("alertText");
+    b.className = "alert-banner " + type;
+    tx.textContent = msg;
+  }
+
+  function hideAlert() {
+    document.getElementById("alertBanner").style.display = "none";
+    document.getElementById("alertBanner").className = "alert-banner";
+  }
+
+  function setStatus(state, label, time = "") {
+    const pill = document.getElementById("statusPill");
+    const lbl = document.getElementById("statusLabel");
+    const tim = document.getElementById("statusTime");
+    pill.className = "status-pill " + state;
+    lbl.textContent = label;
+    tim.textContent = time;
+  }
+
+  function fmtTime(iso) {
+    const d = new Date(iso);
+    return (
+      d.toLocaleTimeString("id-ID", { hour: "2-digit", minute: "2-digit" }) +
+      " · " +
+      d.toLocaleDateString("id-ID", { day: "numeric", month: "short" })
+    );
+  }
+
+  async function getEspIP() {
+    try {
+      const r = await fetch(`${API}/api/esp-ip`, {
+        signal: AbortSignal.timeout(3000),
+      });
+      const data = await r.json();
+      return data.ip || null;
+    } catch {
+      return null;
     }
+  }
 
-    function showToast(msg, type = 'success') {
-        const t = document.getElementById('toast');
-        t.textContent = msg;
-        t.className = 'toast ' + type + ' show';
-        setTimeout(() => t.classList.remove('show'), 2500);
+  async function pingDevice() {
+    try {
+      const r = await fetch(`${API}/api/schedules`, {
+        signal: AbortSignal.timeout(5000),
+      });
+      if (r.ok) {
+        setStatus("online", "online", "terhubung · kamera offline");
+        hideAlert();
+        return true;
+      }
+    } catch (e) {
+      setStatus("offline", "offline");
+      showAlert("Backend tidak merespon — cek server atau tunnel URL", "error");
     }
+    return false;
+  }
 
-    function showAlert(msg, type = 'error') {
-        const b = document.getElementById('alertBanner');
-        const tx = document.getElementById('alertText');
-        b.className = 'alert-banner ' + type;
-        tx.textContent = msg;
+  async function connectDevice() {
+    API = getAPI();
+    setStatus("connecting", "connecting");
+    const ok = await pingDevice();
+    if (ok) {
+      showToast("terhubung ke backend");
+      loadSchedules();
+      loadHistory();
+      clearInterval(pingInterval);
+      pingInterval = setInterval(pingDevice, 10000);
     }
-
-    function hideAlert() {
-        document.getElementById('alertBanner').style.display = 'none';
-        document.getElementById('alertBanner').className = 'alert-banner';
+  }
+  async function startStream() {
+    const espIP = await getEspIP();
+    if (!espIP) {
+      showToast("IP ESP32 belum tersedia — pastiin ESP32 nyala", "error");
+      return;
     }
+    const img = document.getElementById("streamImg");
+    const ph = document.getElementById("camPlaceholder");
+    img.src = `http://${espIP}/stream?t=${Date.now()}`;
+    img.classList.add("active");
+    ph.style.display = "none";
+    document.getElementById("btnStream").classList.add("active");
+    img.onerror = () => {
+      stopStream();
+      showAlert("Stream gagal — pastiin kamera terhubung ke ESP32", "warning");
+      showToast("stream gagal", "error");
+    };
+  }
 
-    function setStatus(state, label, time = '') {
-        const pill = document.getElementById('statusPill');
-        const lbl = document.getElementById('statusLabel');
-        const tim = document.getElementById('statusTime');
-        pill.className = 'status-pill ' + state;
-        lbl.textContent = label;
-        tim.textContent = time;
+  async function takeSnapshot() {
+    const espIP = await getEspIP();
+    if (!espIP) {
+      showToast("IP ESP32 belum tersedia — pastiin ESP32 nyala", "error");
+      return;
     }
+    const img = document.getElementById("streamImg");
+    const ph = document.getElementById("camPlaceholder");
+    img.src = `http://${espIP}/api/snapshot?t=${Date.now()}`;
+    img.classList.add("active");
+    ph.style.display = "none";
+    img.onerror = () => {
+      img.classList.remove("active");
+      ph.style.display = "";
+      showAlert("Snapshot gagal — kamera mungkin tidak siap", "warning");
+      showToast("snapshot gagal", "error");
+    };
+  }
 
-    function fmtTime(iso) {
-        const d = new Date(iso);
-        return d.toLocaleTimeString('id-ID', { hour: '2-digit', minute: '2-digit' }) + ' · ' + d.toLocaleDateString('id-ID', { day: 'numeric', month: 'short' });
+  function stopStream() {
+    const img = document.getElementById("streamImg");
+    const ph = document.getElementById("camPlaceholder");
+    img.src = "";
+    img.classList.remove("active");
+    ph.style.display = "";
+    document.getElementById("btnStream").classList.remove("active");
+  }
+
+  async function manualFeed() {
+    const portion = parseInt(document.getElementById("portionSlider").value);
+    const btn = document.getElementById("feedBtn");
+    btn.disabled = true;
+    btn.textContent = "Memberi makan...";
+    try {
+      const r = await fetch(`${API}/api/feed/manual`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ portion }),
+        signal: AbortSignal.timeout(15000),
+      });
+      if (r.ok) {
+        showToast("Berhasil feed " + portion + "s");
+        hideAlert();
+        loadHistory();
+      } else {
+        showAlert("Feed gagal — server merespon tapi ada error", "error");
+        showToast("feed gagal", "error");
+      }
+    } catch (e) {
+      if (e.name === "TimeoutError") {
+        showAlert("Feed timeout — server tidak merespon", "error");
+        showToast("timeout", "error");
+      } else {
+        showAlert("Tidak bisa konek ke backend", "error");
+        showToast("koneksi gagal", "error");
+      }
     }
+    setTimeout(() => {
+      btn.disabled = false;
+      btn.textContent = "Feed sekarang";
+    }, 2000);
+  }
 
-    async function pingDevice() {
-        try {
-            const r = await fetch(`${API}/api/schedules`, { signal: AbortSignal.timeout(5000) });
-            if (r.ok) {
-                setStatus('online', 'online', 'terhubung · kamera offline');
-                hideAlert();
-                return true;
-            }
-        } catch (e) {
-            setStatus('offline', 'offline');
-            showAlert('Backend tidak merespon — cek server atau tunnel URL', 'error');
-        }
-        return false;
-    }
-
-    async function connectDevice() {
-        API = getAPI();
-        setStatus('connecting', 'connecting');
-        const ok = await pingDevice();
-        if (ok) {
-            showToast('terhubung ke backend');
-            loadSchedules();
-            loadHistory();
-            clearInterval(pingInterval);
-            pingInterval = setInterval(pingDevice, 10000);
-        }
-    }
-
-    function startStream() {
-        const espIP = prompt('Masukkan IP ESP32 (contoh: 192.168.1.x):');
-        if (!espIP) return;
-        const img = document.getElementById('streamImg');
-        const ph = document.getElementById('camPlaceholder');
-        img.src = `http://${espIP}/stream?t=${Date.now()}`;
-        img.classList.add('active');
-        ph.style.display = 'none';
-        document.getElementById('btnStream').classList.add('active');
-        img.onerror = () => {
-            stopStream();
-            showAlert('Stream gagal — pastiin kamera terhubung ke ESP32', 'warning');
-            showToast('stream gagal', 'error');
-        };
-    }
-
-    function takeSnapshot() {
-        const espIP = prompt('Masukkan IP ESP32 (contoh: 192.168.1.x):');
-        if (!espIP) return;
-        const img = document.getElementById('streamImg');
-        const ph = document.getElementById('camPlaceholder');
-        img.src = `http://${espIP}/api/snapshot?t=${Date.now()}`;
-        img.classList.add('active');
-        ph.style.display = 'none';
-        img.onerror = () => {
-            img.classList.remove('active');
-            ph.style.display = '';
-            showAlert('Snapshot gagal — kamera mungkin tidak siap', 'warning');
-            showToast('snapshot gagal', 'error');
-        };
-    }
-
-    function stopStream() {
-        const img = document.getElementById('streamImg');
-        const ph = document.getElementById('camPlaceholder');
-        img.src = '';
-        img.classList.remove('active');
-        ph.style.display = '';
-        document.getElementById('btnStream').classList.remove('active');
-    }
-
-    async function manualFeed() {
-        const portion = parseInt(document.getElementById('portionSlider').value);
-        const btn = document.getElementById('feedBtn');
-        btn.disabled = true;
-        btn.textContent = 'Memberi makan...';
-        try {
-            const r = await fetch(`${API}/api/feed/manual`, {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ portion }),
-                signal: AbortSignal.timeout(15000)
-            });
-            if (r.ok) {
-                showToast('Berhasil feed ' + portion + 's');
-                hideAlert();
-                loadHistory();
-            } else {
-                showAlert('Feed gagal — server merespon tapi ada error', 'error');
-                showToast('feed gagal', 'error');
-            }
-        } catch (e) {
-            if (e.name === 'TimeoutError') {
-                showAlert('Feed timeout — server tidak merespon', 'error');
-                showToast('timeout', 'error');
-            } else {
-                showAlert('Tidak bisa konek ke backend', 'error');
-                showToast('koneksi gagal', 'error');
-            }
-        }
-        setTimeout(() => { btn.disabled = false; btn.textContent = 'Feed sekarang'; }, 2000);
-    }
-
-    async function loadSchedules() {
-        try {
-            const r = await fetch(`${API}/api/schedules`, { signal: AbortSignal.timeout(5000) });
-            const data = await r.json();
-            const el = document.getElementById('scheduleList');
-            if (!data.length) { el.innerHTML = '<p class="empty">belum ada jadwal</p>'; return; }
-            el.innerHTML = data.map(s => `
+  async function loadSchedules() {
+    try {
+      const r = await fetch(`${API}/api/schedules`, {
+        signal: AbortSignal.timeout(5000),
+      });
+      const data = await r.json();
+      const el = document.getElementById("scheduleList");
+      if (!data.length) {
+        el.innerHTML = '<p class="empty">belum ada jadwal</p>';
+        return;
+      }
+      el.innerHTML = data
+        .map(
+          (s) => `
                 <div class="schedule-item">
                     <div>
                         <div class="schedule-time">${s.time}</div>
@@ -838,75 +995,105 @@
                         <button class="del-btn" onclick="deleteSchedule(${s.id})">
                             <svg width="10" height="10" viewBox="0 0 10 10" fill="none"><path d="M2 2L8 8M8 2L2 8" stroke="#E24B4A" stroke-width="1.5" stroke-linecap="round"/></svg>
                         </button>
-                        <div class="toggle ${s.is_active ? 'on' : ''}" onclick="toggleSchedule(${s.id}, this)"></div>
+                        <div class="toggle ${s.is_active ? "on" : ""}" onclick="toggleSchedule(${s.id}, this)"></div>
                     </div>
                 </div>
-            `).join('');
-        } catch { showAlert('Gagal load jadwal', 'warning'); }
+            `,
+        )
+        .join("");
+    } catch {
+      showAlert("Gagal load jadwal", "warning");
     }
+  }
 
-    async function addSchedule() {
-        const time = document.getElementById('newTime').value;
-        const portion = parseInt(document.getElementById('newPortion').value);
-        if (!time || !portion) return;
-        try {
-            const r = await fetch(`${API}/api/schedules`, {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ time, portion }),
-                signal: AbortSignal.timeout(5000)
-            });
-            if (r.ok) { showToast('Jadwal ditambahkan'); loadSchedules(); }
-            else { showToast('gagal tambah jadwal', 'error'); }
-        } catch { showToast('koneksi gagal', 'error'); }
+  async function addSchedule() {
+    const time = document.getElementById("newTime").value;
+    const portion = parseInt(document.getElementById("newPortion").value);
+    if (!time || !portion) return;
+    try {
+      const r = await fetch(`${API}/api/schedules`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ time, portion }),
+        signal: AbortSignal.timeout(5000),
+      });
+      if (r.ok) {
+        showToast("Jadwal ditambahkan");
+        loadSchedules();
+      } else {
+        showToast("gagal tambah jadwal", "error");
+      }
+    } catch {
+      showToast("koneksi gagal", "error");
     }
+  }
 
-    async function toggleSchedule(id, el) {
-        try {
-            const r = await fetch(`${API}/api/schedules/${id}/toggle`, { method: 'PATCH', signal: AbortSignal.timeout(5000) });
-            const data = await r.json();
-            el.classList.toggle('on', !!data.is_active);
-            showToast(data.is_active ? 'Jadwal aktif' : 'Jadwal dinonaktifkan');
-        } catch { showToast('gagal', 'error'); }
+  async function toggleSchedule(id, el) {
+    try {
+      const r = await fetch(`${API}/api/schedules/${id}/toggle`, {
+        method: "PATCH",
+        signal: AbortSignal.timeout(5000),
+      });
+      const data = await r.json();
+      el.classList.toggle("on", !!data.is_active);
+      showToast(data.is_active ? "Jadwal aktif" : "Jadwal dinonaktifkan");
+    } catch {
+      showToast("gagal", "error");
     }
+  }
 
-    async function deleteSchedule(id) {
-        try {
-            await fetch(`${API}/api/schedules/${id}`, { method: 'DELETE', signal: AbortSignal.timeout(5000) });
-            showToast('Jadwal dihapus');
-            loadSchedules();
-        } catch { showToast('gagal hapus', 'error'); }
+  async function deleteSchedule(id) {
+    try {
+      await fetch(`${API}/api/schedules/${id}`, {
+        method: "DELETE",
+        signal: AbortSignal.timeout(5000),
+      });
+      showToast("Jadwal dihapus");
+      loadSchedules();
+    } catch {
+      showToast("gagal hapus", "error");
     }
+  }
 
-    async function loadHistory() {
-        try {
-            const r = await fetch(`${API}/api/feed/history`, { signal: AbortSignal.timeout(5000) });
-            if (!r.ok) return;
-            const data = await r.json();
-            const el = document.getElementById('historyList');
-            if (!data.length) { el.innerHTML = '<p class="empty">belum ada history</p>'; return; }
-            el.innerHTML = data.slice(0, 8).map(h => `
+  async function loadHistory() {
+    try {
+      const r = await fetch(`${API}/api/feed/history`, {
+        signal: AbortSignal.timeout(5000),
+      });
+      if (!r.ok) return;
+      const data = await r.json();
+      const el = document.getElementById("historyList");
+      if (!data.length) {
+        el.innerHTML = '<p class="empty">belum ada history</p>';
+        return;
+      }
+      el.innerHTML = data
+        .slice(0, 8)
+        .map(
+          (h) => `
                 <div class="history-item">
                     <span class="hist-badge hist-${h.type}">${h.type}</span>
                     <span class="hist-portion">${h.portion}s</span>
                     <span class="hist-time">${fmtTime(h.triggered_at)}</span>
                 </div>
-            `).join('');
-        } catch { }
-    }
+            `,
+        )
+        .join("");
+    } catch {}
+  }
 
-    // auto-fetch tunnel URL saat load
-    window.addEventListener('load', async () => {
-        try {
-            const r = await fetch('/api/tunnel-url');
-            const data = await r.json();
-            if (data.url) {
-                API = data.url;
-                document.getElementById('ipInput').value = data.url;
-                connectDevice();
-            }
-        } catch {
-            setStatus('offline', 'offline');
-        }
-    });
-</script>   
+  // auto-fetch tunnel URL saat load
+  window.addEventListener("load", async () => {
+    try {
+      const r = await fetch("/api/tunnel-url");
+      const data = await r.json();
+      if (data.url) {
+        API = data.url;
+        document.getElementById("ipInput").value = data.url;
+        connectDevice();
+      }
+    } catch {
+      setStatus("offline", "offline");
+    }
+  });
+</script>
