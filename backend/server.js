@@ -17,9 +17,9 @@ app.get('/api/tunnel-url', (req, res) => {
   res.json({ url: tunnelUrl });
 });
 
-app.post('/api/esp-ip', (req, res) => {
-  espIP = req.body.ip;
-  console.log('[ESP] IP registered:', espIP);
+app.post('/api/tunnel-url', (req, res) => {
+  tunnelUrl = req.body.url;
+  console.log('[TUNNEL] URL updated:', tunnelUrl);
   res.json({ ok: true });
 });
 
