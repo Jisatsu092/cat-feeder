@@ -849,6 +849,34 @@
     );
   }
 
+  function startStream() {
+    const img = document.getElementById("streamImg");
+    const ph = document.getElementById("camPlaceholder");
+    img.src = `${API}/api/stream?t=${Date.now()}`;
+    img.classList.add("active");
+    ph.style.display = "none";
+    document.getElementById("btnStream").classList.add("active");
+    img.onerror = () => {
+      stopStream();
+      showAlert("Stream gagal — pastiin ESP32 nyala", "warning");
+      showToast("stream gagal", "error");
+    };
+  }
+
+  async function takeSnapshot() {
+    const img = document.getElementById("streamImg");
+    const ph = document.getElementById("camPlaceholder");
+    img.src = `${API}/api/snapshot?t=${Date.now()}`;
+    img.classList.add("active");
+    ph.style.display = "none";
+    img.onerror = () => {
+      img.classList.remove("active");
+      ph.style.display = "";
+      showAlert("Snapshot gagal", "warning");
+      showToast("snapshot gagal", "error");
+    };
+  }
+
   async function getEspIP() {
     try {
       const r = await fetch(`${API}/api/esp-ip`, {
@@ -889,43 +917,6 @@
       clearInterval(pingInterval);
       pingInterval = setInterval(pingDevice, 10000);
     }
-  }
-  async function startStream() {
-    const espIP = await getEspIP();
-    if (!espIP) {
-      showToast("IP ESP32 belum tersedia — pastiin ESP32 nyala", "error");
-      return;
-    }
-    const img = document.getElementById("streamImg");
-    const ph = document.getElementById("camPlaceholder");
-    img.src = `http://${espIP}/stream?t=${Date.now()}`;
-    img.classList.add("active");
-    ph.style.display = "none";
-    document.getElementById("btnStream").classList.add("active");
-    img.onerror = () => {
-      stopStream();
-      showAlert("Stream gagal — pastiin kamera terhubung ke ESP32", "warning");
-      showToast("stream gagal", "error");
-    };
-  }
-
-  async function takeSnapshot() {
-    const espIP = await getEspIP();
-    if (!espIP) {
-      showToast("IP ESP32 belum tersedia — pastiin ESP32 nyala", "error");
-      return;
-    }
-    const img = document.getElementById("streamImg");
-    const ph = document.getElementById("camPlaceholder");
-    img.src = `http://${espIP}/api/snapshot?t=${Date.now()}`;
-    img.classList.add("active");
-    ph.style.display = "none";
-    img.onerror = () => {
-      img.classList.remove("active");
-      ph.style.display = "";
-      showAlert("Snapshot gagal — kamera mungkin tidak siap", "warning");
-      showToast("snapshot gagal", "error");
-    };
   }
 
   function stopStream() {
